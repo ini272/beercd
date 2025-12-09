@@ -6,7 +6,11 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #d2691e 0%, #ff8c00 50%, #ffa500 100%);
+    background: #0a0a0a;
+    background-image: 
+        radial-gradient(at 20% 30%, rgba(0, 255, 200, 0.1) 0px, transparent 50%),
+        radial-gradient(at 80% 70%, rgba(255, 0, 150, 0.1) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(0, 200, 255, 0.05) 0px, transparent 50%);
     min-height: 100vh;
     min-height: -webkit-fill-available; /* iOS Safari */
     display: flex;
@@ -15,56 +19,123 @@ body {
     padding: 20px;
     padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
     -webkit-tap-highlight-color: transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 200, 0.03) 2px, rgba(0, 255, 200, 0.03) 4px);
+    pointer-events: none;
+    z-index: 0;
 }
 
 .container {
-    background: white;
-    border-radius: 20px;
+    background: rgba(20, 20, 25, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 255, 200, 0.2);
+    border-radius: 24px;
     padding: 40px;
     padding: max(20px, env(safe-area-inset-top) + 20px) max(20px, env(safe-area-inset-right) + 20px) max(20px, env(safe-area-inset-bottom) + 20px) max(20px, env(safe-area-inset-left) + 20px);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(0, 255, 200, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     text-align: center;
     max-width: 500px;
     width: 100%;
+    position: relative;
+    z-index: 1;
 }
 
 h1 {
     font-size: 3em;
-    color: #333;
+    color: #00ffc8;
     margin-bottom: 10px;
+    text-shadow: 
+        0 0 10px rgba(0, 255, 200, 0.5),
+        0 0 20px rgba(0, 255, 200, 0.3),
+        0 0 30px rgba(0, 255, 200, 0.2);
+    letter-spacing: 2px;
 }
 
 .subtitle {
-    color: #666;
+    color: rgba(0, 255, 200, 0.7);
     margin-bottom: 30px;
     font-size: 1.1em;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: 300;
 }
 
 .timer-display {
     margin: 30px 0;
     padding: 30px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 255, 200, 0.3);
     border-radius: 15px;
     min-height: 150px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    box-shadow: 
+        inset 0 2px 10px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(0, 255, 200, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.timer-display::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 200, 0.1), transparent);
+    animation: scan 3s linear infinite;
+}
+
+@keyframes scan {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
 }
 
 .time {
     font-size: 3.5em;
     font-weight: bold;
-    color: #333;
+    color: #00ffc8;
     font-variant-numeric: tabular-nums;
     margin-bottom: 10px;
-    font-family: 'Courier New', monospace;
+    font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+    text-shadow: 
+        0 0 10px rgba(0, 255, 200, 0.8),
+        0 0 20px rgba(0, 255, 200, 0.6),
+        0 0 30px rgba(0, 255, 200, 0.4);
+    position: relative;
+    z-index: 1;
 }
 
 .status {
     font-size: 1.2em;
-    color: #666;
+    color: rgba(0, 255, 200, 0.8);
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    z-index: 1;
 }
 
 .beer-button-container {
@@ -77,16 +148,19 @@ h1 {
 }
 
 .beer-button {
-    background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     color: white;
-    border: none;
+    border: 2px solid rgba(0, 255, 200, 0.5);
     padding: 0;
     font-size: 4em;
     font-weight: normal;
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 10px 30px rgba(255, 165, 0, 0.4);
+    box-shadow: 
+        0 0 20px rgba(0, 255, 200, 0.3),
+        0 0 40px rgba(0, 255, 200, 0.2),
+        inset 0 0 20px rgba(0, 255, 200, 0.1);
     width: 120px;
     height: 120px;
     min-width: 120px;
@@ -102,6 +176,35 @@ h1 {
     touch-action: manipulation;
 }
 
+.beer-button::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #00ffc8, #00d4ff, #ff00c8, #00ffc8);
+    background-size: 400% 400%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+    animation: gradient-rotate 3s ease infinite;
+}
+
+.beer-button:hover::before {
+    opacity: 0.5;
+}
+
+@keyframes gradient-rotate {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
 .beer-icon {
     font-size: 1em;
     line-height: 1;
@@ -113,27 +216,33 @@ h1 {
     top: -5px;
     right: -5px;
     font-size: 0.4em;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 255, 200, 0.2);
+    border: 1px solid rgba(0, 255, 200, 0.5);
     border-radius: 50%;
     width: 40px;
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 
+        0 0 10px rgba(0, 255, 200, 0.5),
+        inset 0 0 10px rgba(0, 255, 200, 0.2);
+    color: #00ffc8;
 }
 
 .stop-button {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    border: none;
+    background: rgba(255, 0, 100, 0.2);
+    color: #ff0064;
+    border: 1px solid rgba(255, 0, 100, 0.5);
     border-radius: 50%;
     width: 50px;
     height: 50px;
     font-size: 1.5em;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+    box-shadow: 
+        0 0 15px rgba(255, 0, 100, 0.4),
+        inset 0 0 10px rgba(255, 0, 100, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -148,7 +257,10 @@ h1 {
 
 .stop-button:hover {
     transform: translateY(-2px) scale(1.1);
-    box-shadow: 0 8px 20px rgba(220, 53, 69, 0.5);
+    border-color: rgba(255, 0, 100, 0.8);
+    box-shadow: 
+        0 0 25px rgba(255, 0, 100, 0.6),
+        inset 0 0 15px rgba(255, 0, 100, 0.2);
 }
 
 .stop-button:active {
@@ -157,7 +269,11 @@ h1 {
 
 .beer-button:hover:not(:disabled) {
     transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 15px 40px rgba(255, 165, 0, 0.5);
+    border-color: rgba(0, 255, 200, 0.8);
+    box-shadow: 
+        0 0 30px rgba(0, 255, 200, 0.5),
+        0 0 60px rgba(0, 255, 200, 0.3),
+        inset 0 0 30px rgba(0, 255, 200, 0.2);
 }
 
 .beer-button:active:not(:disabled) {
@@ -167,23 +283,28 @@ h1 {
 .settings {
     margin: 30px 0;
     padding: 20px;
-    background: #f8f9fa;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 255, 200, 0.2);
     border-radius: 10px;
 }
 
 .settings label {
     display: block;
     margin-bottom: 10px;
-    color: #333;
+    color: rgba(0, 255, 200, 0.8);
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9em;
 }
 
 .settings select {
     padding: 10px 15px;
-    border: 2px solid #ddd;
+    border: 1px solid rgba(0, 255, 200, 0.3);
     border-radius: 8px;
     font-size: 1em;
-    background: white;
+    background: rgba(0, 0, 0, 0.5);
+    color: #00ffc8;
     cursor: pointer;
     width: 100%;
     max-width: 250px;
@@ -196,7 +317,8 @@ h1 {
 
 .settings select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: rgba(0, 255, 200, 0.6);
+    box-shadow: 0 0 10px rgba(0, 255, 200, 0.3);
 }
 
 .sound-toggle-container {
@@ -206,8 +328,8 @@ h1 {
 }
 
 .sound-toggle {
-    background: #f8f9fa;
-    border: 2px solid #ddd;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 255, 200, 0.3);
     border-radius: 50%;
     width: 50px;
     height: 50px;
@@ -225,26 +347,63 @@ h1 {
     user-select: none;
     touch-action: manipulation;
     padding: 0;
+    box-shadow: 0 0 10px rgba(0, 255, 200, 0.2);
 }
 
 .sound-toggle:hover {
-    background: #e9ecef;
-    border-color: #667eea;
+    background: rgba(0, 255, 200, 0.1);
+    border-color: rgba(0, 255, 200, 0.6);
     transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(0, 255, 200, 0.4);
 }
 
 .sound-toggle.muted {
-    opacity: 0.6;
-    background: #e9ecef;
+    opacity: 0.5;
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .cooldown-active .time {
-    color: #f5576c;
-    animation: pulse 2s ease-in-out infinite;
+    color: #00ffc8;
+    animation: neon-pulse 2s ease-in-out infinite;
 }
 
 .cooldown-active .status {
-    color: #f5576c;
+    color: #00ffc8;
+}
+
+.cooldown-active .beer-button {
+    animation: button-pulse 2s ease-in-out infinite;
+    border-color: rgba(0, 255, 200, 0.8);
+}
+
+@keyframes neon-pulse {
+    0%, 100% {
+        text-shadow: 
+            0 0 10px rgba(0, 255, 200, 0.8),
+            0 0 20px rgba(0, 255, 200, 0.6),
+            0 0 30px rgba(0, 255, 200, 0.4);
+    }
+    50% {
+        text-shadow: 
+            0 0 20px rgba(0, 255, 200, 1),
+            0 0 40px rgba(0, 255, 200, 0.8),
+            0 0 60px rgba(0, 255, 200, 0.6);
+    }
+}
+
+@keyframes button-pulse {
+    0%, 100% {
+        box-shadow: 
+            0 0 20px rgba(0, 255, 200, 0.3),
+            0 0 40px rgba(0, 255, 200, 0.2),
+            inset 0 0 20px rgba(0, 255, 200, 0.1);
+    }
+    50% {
+        box-shadow: 
+            0 0 30px rgba(0, 255, 200, 0.6),
+            0 0 60px rgba(0, 255, 200, 0.4),
+            inset 0 0 30px rgba(0, 255, 200, 0.2);
+    }
 }
 
 @keyframes pulse {
@@ -356,7 +515,7 @@ h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.9) 0%, rgba(255, 140, 0, 0.9) 50%, rgba(210, 105, 30, 0.9) 100%);
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -384,10 +543,12 @@ h1 {
 .bubble {
     position: absolute;
     bottom: -10px;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(0, 255, 200, 0.6);
     border-radius: 50%;
     animation: bubble-rise linear infinite;
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    box-shadow: 
+        0 0 10px rgba(0, 255, 200, 0.8),
+        0 0 20px rgba(0, 255, 200, 0.5);
 }
 
 @keyframes bubble-rise {
