@@ -1,0 +1,407 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #d2691e 0%, #ff8c00 50%, #ffa500 100%);
+    min-height: 100vh;
+    min-height: -webkit-fill-available; /* iOS Safari */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+    -webkit-tap-highlight-color: transparent;
+}
+
+.container {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    padding: max(20px, env(safe-area-inset-top) + 20px) max(20px, env(safe-area-inset-right) + 20px) max(20px, env(safe-area-inset-bottom) + 20px) max(20px, env(safe-area-inset-left) + 20px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+}
+
+h1 {
+    font-size: 3em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.timer-display {
+    margin: 30px 0;
+    padding: 30px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 15px;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.time {
+    font-size: 3.5em;
+    font-weight: bold;
+    color: #333;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 10px;
+    font-family: 'Courier New', monospace;
+}
+
+.status {
+    font-size: 1.2em;
+    color: #666;
+    font-weight: 500;
+}
+
+.beer-button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    gap: 15px;
+}
+
+.beer-button {
+    background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+    color: white;
+    border: none;
+    padding: 0;
+    font-size: 4em;
+    font-weight: normal;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(255, 165, 0, 0.4);
+    width: 120px;
+    height: 120px;
+    min-width: 120px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.beer-icon {
+    font-size: 1em;
+    line-height: 1;
+    display: block;
+}
+
+.refresh-icon {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 0.4em;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.stop-button {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.stop-button:hover {
+    transform: translateY(-2px) scale(1.1);
+    box-shadow: 0 8px 20px rgba(220, 53, 69, 0.5);
+}
+
+.stop-button:active {
+    transform: translateY(0) scale(0.95);
+}
+
+.beer-button:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(255, 165, 0, 0.5);
+}
+
+.beer-button:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+}
+
+.settings {
+    margin: 30px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.settings label {
+    display: block;
+    margin-bottom: 10px;
+    color: #333;
+    font-weight: 500;
+}
+
+.settings select {
+    padding: 10px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
+    background: white;
+    cursor: pointer;
+    width: 100%;
+    max-width: 250px;
+    min-height: 44px; /* Minimum touch target size */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    touch-action: manipulation;
+}
+
+.settings select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.sound-toggle-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.sound-toggle {
+    background: #f8f9fa;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+    padding: 0;
+}
+
+.sound-toggle:hover {
+    background: #e9ecef;
+    border-color: #667eea;
+    transform: scale(1.1);
+}
+
+.sound-toggle.muted {
+    opacity: 0.6;
+    background: #e9ecef;
+}
+
+.cooldown-active .time {
+    color: #f5576c;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.cooldown-active .status {
+    color: #f5576c;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 480px) {
+    .container {
+        padding: 20px;
+        padding: max(15px, env(safe-area-inset-top) + 15px) max(15px, env(safe-area-inset-right) + 15px) max(15px, env(safe-area-inset-bottom) + 15px) max(15px, env(safe-area-inset-left) + 15px);
+        border-radius: 15px;
+    }
+    
+    h1 {
+        font-size: 2.2em;
+    }
+    
+    .subtitle {
+        font-size: 1em;
+        margin-bottom: 20px;
+    }
+    
+    .timer-display {
+        margin: 20px 0;
+        padding: 20px;
+        min-height: 120px;
+    }
+    
+    .time {
+        font-size: 2.5em;
+    }
+    
+    .status {
+        font-size: 1em;
+    }
+    
+    .beer-button {
+        width: 100px;
+        height: 100px;
+        min-width: 100px;
+        min-height: 100px;
+        font-size: 3.5em;
+    }
+    
+    .refresh-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 0.35em;
+    }
+    
+    .stop-button {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3em;
+    }
+    
+    .settings {
+        margin: 20px 0;
+        padding: 15px;
+    }
+}
+
+/* Prevent zoom on input focus for iOS */
+@media screen and (max-width: 768px) {
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+    .container {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 1.8em;
+        margin-bottom: 5px;
+    }
+    
+    .subtitle {
+        font-size: 0.9em;
+        margin-bottom: 15px;
+    }
+    
+    .timer-display {
+        margin: 15px 0;
+        padding: 15px;
+        min-height: 100px;
+    }
+    
+    .time {
+        font-size: 2em;
+    }
+}
+
+/* Bubbly beer animation overlay */
+.beer-animation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.9) 0%, rgba(255, 140, 0, 0.9) 50%, rgba(210, 105, 30, 0.9) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.beer-animation-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.bubbles-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.bubble {
+    position: absolute;
+    bottom: -10px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    animation: bubble-rise linear infinite;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+@keyframes bubble-rise {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateY(-100vh) scale(1.2);
+        opacity: 0;
+    }
+}
+
+
