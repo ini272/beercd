@@ -1,6 +1,6 @@
-# BeerCD - Beer Cooldown Timer 🍺
+# BeerCD - Beer Cooldown Timer 🍺 (AI - Generated)
 
-A simple web app to help limit beer intake by enforcing a cooldown period between drinks.
+A simple web app to help track beer consumption using a cooldown timer.
 
 ## Features
 
