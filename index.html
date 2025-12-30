@@ -12,8 +12,24 @@
 </head>
 <body>
     <div class="container">
-        <h1>🍺 BeerCD</h1>
-        <p class="subtitle">Beer Cooldown Timer</p>
+        <h1>🍺 CoolDown Tracker</h1>
+        <p class="subtitle">Beer & Shot Timers</p>
+        
+        <!-- Tab navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" id="beerTab" onclick="switchTab('beer')">🍺 Beer</button>
+            <button class="tab-btn" id="shotTab" onclick="switchTab('shot')">🍸 Shot</button>
+        </div>
+        
+        <!-- Counter badge -->
+        <div class="counter-badge" id="counterBadge">
+            <span id="beerCount">🍺 0</span> | <span id="shotCount">🍸 0</span>
+        </div>
+        
+        <!-- Inactive timer preview -->
+        <div class="inactive-timer-preview" id="inactivePreview" style="display: none;">
+            <span id="inactiveLabel">Shot: </span><span id="inactiveTime">--:--:--</span>
+        </div>
         
         <div class="timer-display" id="timerDisplay">
             <div class="time" id="timeDisplay">--:--:--</div>
@@ -21,13 +37,25 @@
         </div>
         
         <div class="beer-button-container">
-            <button class="beer-button" id="beerButton" onclick="startCooldown()">
-                <span class="beer-icon">🍺</span>
+            <button class="beer-button" id="mainButton" onclick="startCooldown()">
+                <span class="beer-icon" id="buttonIcon">🍺</span>
                 <span class="refresh-icon" id="refreshIcon" style="display: none;">🔄</span>
             </button>
             <button class="stop-button" id="stopButton" onclick="stopCooldown()" style="display: none;" title="Stop cooldown">
                 ⏹️
             </button>
+        </div>
+        
+        <!-- History section -->
+        <button class="history-toggle" id="historyToggle" onclick="toggleHistory()">
+            <span id="historyIcon">▼</span> History
+        </button>
+        
+        <div class="history-section" id="historySection" style="display: none;">
+            <div class="history-list" id="historyList">
+                <div class="empty-history">No drinks yet today</div>
+            </div>
+            <button class="reset-history-btn" onclick="resetHistory()">Clear History</button>
         </div>
         
         <div class="settings">

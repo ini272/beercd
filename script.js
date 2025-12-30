@@ -1,6 +1,15 @@
-// Cooldown duration in hours (default: 1 hour)
-let cooldownDuration = 1;
-let cooldownEndTime = null;
+// Active tab
+let activeTab = 'beer'; // 'beer' or 'shot'
+
+// Beer cooldown state
+let beerDuration = 1;
+let beerEndTime = null;
+
+// Shot cooldown state
+let shotDuration = 1;
+let shotEndTime = null;
+
+// Timer management
 let timerInterval = null;
 let soundEnabled = false;
 let notificationsEnabled = false;
@@ -9,16 +18,173 @@ let notificationsEnabled = false;
 let customHours = 1;
 let customMinutes = 0;
 
+// History tracking
+let beerHistory = [];
+let shotHistory = [];
+
+// Helper functions to get/set active cooldown
+function getActiveDuration() {
+    return activeTab === 'beer' ? beerDuration : shotDuration;
+}
+
+function setActiveDuration(value) {
+    if (activeTab === 'beer') {
+        beerDuration = value;
+    } else {
+        shotDuration = value;
+    }
+}
+
+function getActiveEndTime() {
+    return activeTab === 'beer' ? beerEndTime : shotEndTime;
+}
+
+function setActiveEndTime(value) {
+    if (activeTab === 'beer') {
+        beerEndTime = value;
+    } else {
+        shotEndTime = value;
+    }
+}
+
+function getInactiveDuration() {
+    return activeTab === 'beer' ? shotDuration : beerDuration;
+}
+
+function getInactiveEndTime() {
+    return activeTab === 'beer' ? shotEndTime : beerEndTime;
+}
+
+// History functions
+function getTodayKey() {
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    return `beercd_history_${today}`;
+}
+
+function loadHistory() {
+    const todayKey = getTodayKey();
+    const saved = localStorage.getItem(todayKey);
+    if (saved) {
+        const parsed = JSON.parse(saved);
+        beerHistory = parsed.beers || [];
+        shotHistory = parsed.shots || [];
+    } else {
+        beerHistory = [];
+        shotHistory = [];
+    }
+}
+
+function saveHistory() {
+    const todayKey = getTodayKey();
+    localStorage.setItem(todayKey, JSON.stringify({
+        beers: beerHistory,
+        shots: shotHistory
+    }));
+    updateCounterBadge();
+    updateHistoryDisplay();
+}
+
+function trackDrink(type) {
+    const now = new Date();
+    const time = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+    
+    if (type === 'beer') {
+        beerHistory.push(time);
+    } else if (type === 'shot') {
+        shotHistory.push(time);
+    }
+    
+    saveHistory();
+}
+
+function updateCounterBadge() {
+    document.getElementById('beerCount').textContent = '🍺 ' + beerHistory.length;
+    document.getElementById('shotCount').textContent = '🍸 ' + shotHistory.length;
+}
+
+function updateHistoryDisplay() {
+    const historyList = document.getElementById('historyList');
+    const allDrinks = [];
+    
+    beerHistory.forEach(time => allDrinks.push({ time, type: 'beer' }));
+    shotHistory.forEach(time => allDrinks.push({ time, type: 'shot' }));
+    
+    // Sort by time
+    allDrinks.sort((a, b) => a.time.localeCompare(b.time));
+    
+    if (allDrinks.length === 0) {
+        historyList.innerHTML = '<div class="empty-history">No drinks yet today</div>';
+        return;
+    }
+    
+    historyList.innerHTML = allDrinks.map(drink => 
+        `<div class="history-item">${drink.time} ${drink.type === 'beer' ? '🍺' : '🍸'}</div>`
+    ).join('');
+}
+
+function toggleHistory() {
+    const section = document.getElementById('historySection');
+    const icon = document.getElementById('historyIcon');
+    
+    if (section.style.display === 'none') {
+        section.style.display = 'block';
+        icon.textContent = '▲';
+    } else {
+        section.style.display = 'none';
+        icon.textContent = '▼';
+    }
+}
+
+function resetHistory() {
+    if (confirm('Clear today\'s history?')) {
+        beerHistory = [];
+        shotHistory = [];
+        saveHistory();
+    }
+}
+
 // Load saved cooldown state from localStorage
 function loadCooldownState() {
-    const savedEndTime = localStorage.getItem('beercd_endTime');
-    const savedDuration = localStorage.getItem('beercd_duration');
+    // Load history
+    loadHistory();
+    updateCounterBadge();
+    updateHistoryDisplay();
+    
+    // Load beer state
+    const savedBeerDuration = localStorage.getItem('beercd_beer_duration');
+    const savedBeerEndTime = localStorage.getItem('beercd_beer_endTime');
+    
+    if (savedBeerDuration) {
+        beerDuration = parseFloat(savedBeerDuration);
+    }
+    
+    if (savedBeerEndTime) {
+        beerEndTime = parseInt(savedBeerEndTime);
+        const now = Date.now();
+        if (beerEndTime <= now) {
+            beerEndTime = null;
+        }
+    }
+    
+    // Load shot state
+    const savedShotDuration = localStorage.getItem('beercd_shot_duration');
+    const savedShotEndTime = localStorage.getItem('beercd_shot_endTime');
+    
+    if (savedShotDuration) {
+        shotDuration = parseFloat(savedShotDuration);
+    }
+    
+    if (savedShotEndTime) {
+        shotEndTime = parseInt(savedShotEndTime);
+        const now = Date.now();
+        if (shotEndTime <= now) {
+            shotEndTime = null;
+        }
+    }
+    
+    // Load settings
     const savedSoundEnabled = localStorage.getItem('beercd_soundEnabled');
     const savedNotificationsEnabled = localStorage.getItem('beercd_notificationsEnabled');
-    
-    if (savedDuration) {
-        cooldownDuration = parseFloat(savedDuration);
-    }
     
     if (savedSoundEnabled !== null) {
         soundEnabled = savedSoundEnabled === 'true';
@@ -34,19 +200,9 @@ function loadCooldownState() {
         notificationsEnabled = true;
     }
     
-    if (savedEndTime) {
-        cooldownEndTime = parseInt(savedEndTime);
-        const now = Date.now();
-        
-        if (cooldownEndTime > now) {
-            // Cooldown is still active
-            startTimer();
-            // Check if timer expired while app was closed
-            checkExpiredTimer();
-        } else {
-            // Cooldown has expired
-            clearCooldown();
-        }
+    // Start timer if any cooldown is active
+    if (beerEndTime || shotEndTime) {
+        startTimer();
     }
     
     updateDisplay();
@@ -54,12 +210,23 @@ function loadCooldownState() {
 
 // Save cooldown state to localStorage
 function saveCooldownState() {
-    if (cooldownEndTime) {
-        localStorage.setItem('beercd_endTime', cooldownEndTime.toString());
+    // Save beer state
+    if (beerEndTime) {
+        localStorage.setItem('beercd_beer_endTime', beerEndTime.toString());
     } else {
-        localStorage.removeItem('beercd_endTime');
+        localStorage.removeItem('beercd_beer_endTime');
     }
-    localStorage.setItem('beercd_duration', cooldownDuration.toString());
+    localStorage.setItem('beercd_beer_duration', beerDuration.toString());
+    
+    // Save shot state
+    if (shotEndTime) {
+        localStorage.setItem('beercd_shot_endTime', shotEndTime.toString());
+    } else {
+        localStorage.removeItem('beercd_shot_endTime');
+    }
+    localStorage.setItem('beercd_shot_duration', shotDuration.toString());
+    
+    // Save settings
     localStorage.setItem('beercd_soundEnabled', soundEnabled.toString());
     localStorage.setItem('beercd_notificationsEnabled', notificationsEnabled.toString());
 }
@@ -193,8 +360,9 @@ function checkExpiredTimer() {
 // Start the cooldown
 async function startCooldown() {
     // Always reset/start a new cooldown when button is clicked
-    if (cooldownEndTime) {
-        clearCooldown();
+    const activeEndTime = getActiveEndTime();
+    if (activeEndTime) {
+        setActiveEndTime(null);
     }
     
     // Request notification permission if not already granted
@@ -204,8 +372,12 @@ async function startCooldown() {
     playBeerSound();
     showBeerAnimation();
     
+    // Track the drink
+    trackDrink(activeTab);
+    
     const now = Date.now();
-    cooldownEndTime = now + (cooldownDuration * 60 * 60 * 1000);
+    const activeDuration = getActiveDuration();
+    setActiveEndTime(now + (activeDuration * 60 * 60 * 1000));
     
     saveCooldownState();
     startTimer();
@@ -226,28 +398,17 @@ async function startCooldown() {
 
 // Stop the cooldown (called by stop button)
 function stopCooldown() {
-    clearCooldown();
-}
-
-// Clear the cooldown
-function clearCooldown() {
-    cooldownEndTime = null;
-    
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
-    
-    localStorage.removeItem('beercd_endTime');
+    setActiveEndTime(null);
+    saveCooldownState();
     updateDisplay();
-    
-    document.querySelector('.timer-display').classList.remove('cooldown-active');
     
     // Hide stop button
     const stopButton = document.getElementById('stopButton');
     if (stopButton) {
         stopButton.style.display = 'none';
     }
+    
+    document.querySelector('.timer-display').classList.remove('cooldown-active');
 }
 
 // Schedule notification in service worker
@@ -295,8 +456,31 @@ function updateDisplay() {
     const statusDisplay = document.getElementById('statusDisplay');
     const refreshIcon = document.getElementById('refreshIcon');
     const stopButton = document.getElementById('stopButton');
+    const inactivePreview = document.getElementById('inactivePreview');
+    const inactiveTime = document.getElementById('inactiveTime');
     
-    if (!cooldownEndTime) {
+    const activeEndTime = getActiveEndTime();
+    const inactiveEndTime = getInactiveEndTime();
+    
+    // Update inactive timer preview
+    if (inactiveEndTime) {
+        const now = Date.now();
+        const inactiveRemaining = Math.max(0, inactiveEndTime - now);
+        if (inactiveRemaining > 0) {
+            const iHours = Math.floor(inactiveRemaining / (1000 * 60 * 60));
+            const iMinutes = Math.floor((inactiveRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const iSeconds = Math.floor((inactiveRemaining % (1000 * 60)) / 1000);
+            inactiveTime.textContent = String(iHours).padStart(2, '0') + ':' + String(iMinutes).padStart(2, '0') + ':' + String(iSeconds).padStart(2, '0');
+            inactivePreview.style.display = 'block';
+        } else {
+            inactivePreview.style.display = 'none';
+        }
+    } else {
+        inactivePreview.style.display = 'none';
+    }
+    
+    // Update active timer
+    if (!activeEndTime) {
         timeDisplay.textContent = '--:--:--';
         statusDisplay.textContent = 'Ready';
         if (refreshIcon) {
@@ -309,7 +493,7 @@ function updateDisplay() {
     }
     
     const now = Date.now();
-    const remaining = Math.max(0, cooldownEndTime - now);
+    const remaining = Math.max(0, activeEndTime - now);
     
     if (remaining === 0) {
         timeDisplay.textContent = '00:00:00';
@@ -320,6 +504,8 @@ function updateDisplay() {
         if (stopButton) {
             stopButton.style.display = 'none';
         }
+        setActiveEndTime(null);
+        saveCooldownState();
         return;
     }
     
@@ -342,6 +528,28 @@ function updateDisplay() {
     }
 }
 
+// Switch between beer and shot tabs
+function switchTab(tab) {
+    activeTab = tab;
+    
+    // Update tab UI
+    document.getElementById('beerTab').classList.toggle('active', tab === 'beer');
+    document.getElementById('shotTab').classList.toggle('active', tab === 'shot');
+    
+    // Update button icon
+    document.getElementById('buttonIcon').textContent = tab === 'beer' ? '🍺' : '🍸';
+    
+    // Update inactive preview label
+    const label = document.getElementById('inactiveLabel');
+    label.textContent = tab === 'beer' ? 'Shot: ' : 'Beer: ';
+    
+    // Sync custom spinner from active duration
+    syncCustomSpinnerFromActive();
+    
+    // Update display
+    updateDisplay();
+}
+
 // Toggle custom duration section
 function toggleCustomDuration() {
     const section = document.getElementById('customSection');
@@ -359,13 +567,21 @@ function toggleCustomDuration() {
 
 // Set preset duration and update UI
 function setPresetDuration(hours) {
-    cooldownDuration = hours;
+    setActiveDuration(hours);
     saveCooldownState();
     updatePresetButtonsUI();
     updateCustomSpinnerDisplay();
 }
 
-// Update custom spinner display
+// Sync custom spinner from active duration (called when switching tabs)
+function syncCustomSpinnerFromActive() {
+    const activeDuration = getActiveDuration();
+    customHours = Math.floor(activeDuration);
+    customMinutes = Math.round((activeDuration - customHours) * 60);
+    updateCustomSpinnerDisplay();
+}
+
+// Update custom spinner display (only updates DOM, doesn't reset values)
 function updateCustomSpinnerDisplay() {
     const hourDisplay = document.getElementById('hourDisplay');
     const minuteDisplay = document.getElementById('minuteDisplay');
@@ -437,7 +653,8 @@ function applyCustomDuration() {
         return;
     }
     
-    cooldownDuration = totalMinutes / 60; // Convert back to hours
+    const newDuration = totalMinutes / 60; // Convert back to hours
+    setActiveDuration(newDuration);
     saveCooldownState();
     updatePresetButtonsUI();
     
@@ -453,11 +670,9 @@ function applyCustomDuration() {
     }
 }
 
-// Reset custom duration to current cooldownDuration
+// Reset custom duration to current active duration
 function resetCustomDuration() {
-    customHours = Math.floor(cooldownDuration);
-    customMinutes = Math.round((cooldownDuration - customHours) * 60);
-    updateCustomSpinnerDisplay();
+    syncCustomSpinnerFromActive();
 }
 
 // Update preset button UI to show which is active
@@ -470,30 +685,34 @@ function updatePresetButtonsUI() {
         { value: 3, hours: 3, minutes: 0 }
     ];
     
+    const activeDuration = getActiveDuration();
     const buttons = document.querySelectorAll('.preset-btn');
     buttons.forEach((btn, idx) => {
         const preset = presets[idx];
-        const match = Math.abs(cooldownDuration - preset.value) < 0.01;
+        const match = Math.abs(activeDuration - preset.value) < 0.01;
         btn.classList.toggle('active', match);
     });
 }
 
 // Handle visibility changes (app backgrounded/foregrounded)
 document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && cooldownEndTime) {
+    if (!document.hidden) {
         // App became visible - update display immediately
         updateDisplay();
         
-        // Check if cooldown expired while in background
+        // Check if any cooldowns expired while in background
         const now = Date.now();
-        if (cooldownEndTime <= now) {
+        const activeEndTime = getActiveEndTime();
+        
+        if (activeEndTime && activeEndTime <= now) {
             if (notificationsEnabled) {
                 showTimerNotification();
             } else {
                 alert('Cooldown complete! 🍺');
             }
-            clearCooldown();
-        } else if (!timerInterval) {
+            setActiveEndTime(null);
+            saveCooldownState();
+        } else if (!timerInterval && (beerEndTime || shotEndTime)) {
             // Restart timer if it was stopped
             startTimer();
         }
@@ -502,22 +721,23 @@ document.addEventListener('visibilitychange', () => {
 
 // Handle page focus/blur for additional reliability
 window.addEventListener('focus', () => {
-    if (cooldownEndTime) {
+    if (beerEndTime || shotEndTime) {
         updateDisplay();
         const now = Date.now();
-        if (cooldownEndTime <= now) {
+        const activeEndTime = getActiveEndTime();
+        
+        if (activeEndTime && activeEndTime <= now) {
             if (notificationsEnabled) {
                 showTimerNotification();
             } else {
                 alert('Cooldown complete! 🍺');
             }
-            clearCooldown();
+            setActiveEndTime(null);
+            saveCooldownState();
         } else if (!timerInterval) {
             startTimer();
         }
     }
-    // Check if timer expired while app was closed
-    checkExpiredTimer();
 });
 
 // Touch/swipe support for spinners
