@@ -31,14 +31,50 @@
         </div>
         
         <div class="settings">
-            <label for="cooldownHours">Cooldown Duration:</label>
-            <select id="cooldownHours" onchange="updateCooldownDuration()">
-                <option value="0.5">30 minutes</option>
-                <option value="1" selected>1 hour</option>
-                <option value="1.5">1.5 hours</option>
-                <option value="2">2 hours</option>
-                <option value="3">3 hours</option>
-            </select>
+            <label>Cooldown Duration:</label>
+            
+            <!-- Preset buttons -->
+            <div class="preset-buttons">
+                <button class="preset-btn" onclick="setPresetDuration(0.5)">30m</button>
+                <button class="preset-btn active" onclick="setPresetDuration(1)">1h</button>
+                <button class="preset-btn" onclick="setPresetDuration(1.5)">1.5h</button>
+                <button class="preset-btn" onclick="setPresetDuration(2)">2h</button>
+                <button class="preset-btn" onclick="setPresetDuration(3)">3h</button>
+            </div>
+            
+            <!-- Custom duration toggle -->
+            <button class="custom-duration-toggle" id="customToggle" onclick="toggleCustomDuration()">
+                <span id="toggleIcon">▼</span> Custom Duration
+            </button>
+            
+            <!-- Custom duration section -->
+            <div class="custom-duration-section" id="customSection" style="display: none;">
+                <div class="custom-label">Custom Duration</div>
+                <div class="live-preview" id="livePreview">1h 0m</div>
+                
+                <div class="spinners-container">
+                    <!-- Hour spinner -->
+                    <div class="spinner">
+                        <button class="spinner-btn spinner-up" onclick="incrementHour()">▲</button>
+                        <div class="spinner-value" id="hourDisplay">1</div>
+                        <button class="spinner-btn spinner-down" onclick="decrementHour()">▼</button>
+                        <div class="spinner-label">hours</div>
+                    </div>
+                    
+                    <!-- Minute spinner -->
+                    <div class="spinner">
+                        <button class="spinner-btn spinner-up" onclick="incrementMinute()">▲</button>
+                        <div class="spinner-value" id="minuteDisplay">0</div>
+                        <button class="spinner-btn spinner-down" onclick="decrementMinute()">▼</button>
+                        <div class="spinner-label">minutes</div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="apply-custom-btn" onclick="applyCustomDuration()">Apply</button>
+                    <button class="reset-custom-btn" onclick="resetCustomDuration()">Reset</button>
+                </div>
+            </div>
         </div>
         
         <div class="sound-toggle-container">
