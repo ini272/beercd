@@ -83,7 +83,7 @@ body::before {
     border: 3px solid #8b4513;
     border-radius: 12px;
     padding: 40px;
-    padding: max(20px, env(safe-area-inset-top) + 20px) max(20px, env(safe-area-inset-right) + 20px) max(20px, env(safe-area-inset-bottom) + 20px) max(20px, env(safe-area-inset-left) + 20px);
+    padding: max(20px, env(safe-area-inset-top) + 20px) max(20px, env(safe-area-inset-right) + 20px) max(40px, env(safe-area-inset-bottom) + 40px) max(20px, env(safe-area-inset-left) + 20px);
     box-shadow: 
         0 10px 40px rgba(0, 0, 0, 0.4),
         inset 0 2px 4px rgba(255, 255, 255, 0.3),
@@ -685,16 +685,33 @@ h1 {
     font-variant-numeric: tabular-nums;
     font-family: 'Courier New', monospace;
     text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
-    cursor: grab;
+    cursor: text;
     padding: 8px;
     border-radius: 6px;
     transition: background-color 0.2s ease;
-    user-select: none;
+    border: 2px solid #8b4513;
+    background: rgba(139, 69, 19, 0.1);
+}
+
+.spinner-value:focus {
+    outline: none;
+    background-color: rgba(139, 69, 19, 0.25);
+    box-shadow: 0 0 8px rgba(218, 165, 32, 0.5);
 }
 
 .spinner-value:active {
-    cursor: grabbing;
     background-color: rgba(139, 69, 19, 0.2);
+}
+
+/* Remove number input spinner arrows */
+.spinner-value::-webkit-outer-spin-button,
+.spinner-value::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.spinner-value[type=number] {
+    -moz-appearance: textfield;
 }
 
 .spinner-label {
@@ -771,6 +788,8 @@ h1 {
 /* Controls container */
 .controls-container {
     margin-top: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
     display: flex;
     justify-content: center;
     gap: 10px;
@@ -932,11 +951,19 @@ body.dark-mode .spinner-btn {
 
 body.dark-mode .spinner-value {
     color: #ffd700;
+    background: rgba(218, 165, 32, 0.1);
+    border-color: #8b4513;
+}
+
+body.dark-mode .spinner-value:focus {
+    background-color: rgba(218, 165, 32, 0.2);
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
 }
 
 body.dark-mode .apply-custom-btn,
 body.dark-mode .reset-custom-btn,
-body.dark-mode .history-toggle {
+body.dark-mode .history-toggle,
+body.dark-mode .reset-history-btn {
     background: linear-gradient(135deg, #3a2415 0%, #2d1810 100%);
     border-color: #8b4513;
     color: #ffd700;
@@ -944,7 +971,8 @@ body.dark-mode .history-toggle {
 
 body.dark-mode .apply-custom-btn:hover,
 body.dark-mode .reset-custom-btn:hover,
-body.dark-mode .history-toggle:hover {
+body.dark-mode .history-toggle:hover,
+body.dark-mode .reset-history-btn:hover {
     background: linear-gradient(135deg, #4a3420 0%, #3a2415 100%);
 }
 

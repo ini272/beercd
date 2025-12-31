@@ -11,7 +11,7 @@ let shotEndTime = null;
 
 // Timer management
 let timerInterval = null;
-let soundEnabled = false;
+let soundEnabled = true;  // Sound enabled by default
 let notificationsEnabled = false;
 
 // Custom duration spinner state
@@ -628,15 +628,76 @@ function updateCustomSpinnerDisplay() {
     const minuteDisplay = document.getElementById('minuteDisplay');
     
     if (hourDisplay) {
-        hourDisplay.textContent = customHours;
+        hourDisplay.value = customHours;
     }
     
     if (minuteDisplay) {
-        minuteDisplay.textContent = String(customMinutes).padStart(2, '0');
+        minuteDisplay.value = String(customMinutes).padStart(2, '0');
     }
     
     updateLivePreview();
 }
+
+// Handle direct hour input
+function onHourInput() {
+    const hourDisplay = document.getElementById('hourDisplay');
+    let hours = parseInt(hourDisplay.value) || 0;
+    
+    // Validate range
+    if (hours < 0) hours = 0;
+    if (hours > 23) hours = 23;
+    
+    customHours = hours;
+    hourDisplay.value = hours;
+    updateLivePreview();
+}
+
+// Handle direct minute input
+function onMinuteInput() {
+    const minuteDisplay = document.getElementById('minuteDisplay');
+    let minutes = parseInt(minuteDisplay.value) || 0;
+    
+    // Validate range
+    if (minutes < 0) minutes = 0;
+    if (minutes > 59) minutes = 59;
+    
+    customMinutes = minutes;
+    minuteDisplay.value = String(minutes).padStart(2, '0');
+    updateLivePreview();
+}
+
+// Increment hour
+function incrementHour() {
+    if (customHours < 23) {
+        customHours++;
+        updateCustomSpinnerDisplay();
+    }
+}
+
+// Decrement hour
+function decrementHour() {
+    if (customHours > 0) {
+        customHours--;
+        updateCustomSpinnerDisplay();
+    }
+}
+
+// Increment minute
+function incrementMinute() {
+    if (customMinutes < 59) {
+        customMinutes++;
+        updateCustomSpinnerDisplay();
+    }
+}
+
+// Decrement minute
+function decrementMinute() {
+    if (customMinutes > 0) {
+        customMinutes--;
+        updateCustomSpinnerDisplay();
+    }
+}
+
 
 // Update live preview text
 function updateLivePreview() {
@@ -656,33 +717,7 @@ function updateLivePreview() {
     document.getElementById('livePreview').textContent = preview;
 }
 
-// Increment hour
-function incrementHour() {
-    if (customHours < 23) {
-        customHours++;
-        updateCustomSpinnerDisplay();
-    }
-}
 
-// Decrement hour
-function decrementHour() {
-    if (customHours > 0) {
-        customHours--;
-        updateCustomSpinnerDisplay();
-    }
-}
-
-// Increment minute (wraps at 60)
-function incrementMinute() {
-    customMinutes = (customMinutes + 5) % 60;
-    updateCustomSpinnerDisplay();
-}
-
-// Decrement minute (wraps at 0)
-function decrementMinute() {
-    customMinutes = (customMinutes - 5 + 60) % 60;
-    updateCustomSpinnerDisplay();
-}
 
 // Apply custom duration
 function applyCustomDuration() {
@@ -714,14 +749,15 @@ function applyCustomDuration() {
 // Reset custom duration to current active duration
 function resetCustomDuration() {
     syncCustomSpinnerFromActive();
+    updateCustomSpinnerDisplay();
 }
 
 // Update preset button UI to show which is active
 function updatePresetButtonsUI() {
     const presets = [
+        { value: 0.25, hours: 0, minutes: 15 },
         { value: 0.5, hours: 0, minutes: 30 },
         { value: 1, hours: 1, minutes: 0 },
-        { value: 1.5, hours: 1, minutes: 30 },
         { value: 2, hours: 2, minutes: 0 },
         { value: 3, hours: 3, minutes: 0 }
     ];
@@ -781,62 +817,7 @@ window.addEventListener('focus', () => {
     }
 });
 
-// Touch/swipe support for spinners
-let touchStartY = 0;
-let touchStartValue = 0;
-let spinnerType = null; // 'hours' or 'minutes'
 
-function initSpinnerTouch() {
-    const hourDisplay = document.getElementById('hourDisplay');
-    const minuteDisplay = document.getElementById('minuteDisplay');
-    
-    if (hourDisplay) {
-        hourDisplay.addEventListener('touchstart', (e) => handleSpinnerTouchStart(e, 'hours'), false);
-        hourDisplay.addEventListener('touchmove', (e) => handleSpinnerTouchMove(e), false);
-        hourDisplay.addEventListener('touchend', (e) => handleSpinnerTouchEnd(e), false);
-    }
-    
-    if (minuteDisplay) {
-        minuteDisplay.addEventListener('touchstart', (e) => handleSpinnerTouchStart(e, 'minutes'), false);
-        minuteDisplay.addEventListener('touchmove', (e) => handleSpinnerTouchMove(e), false);
-        minuteDisplay.addEventListener('touchend', (e) => handleSpinnerTouchEnd(e), false);
-    }
-}
-
-function handleSpinnerTouchStart(e, type) {
-    touchStartY = e.touches[0].clientY;
-    spinnerType = type;
-    touchStartValue = type === 'hours' ? customHours : customMinutes;
-}
-
-function handleSpinnerTouchMove(e) {
-    if (!spinnerType) return;
-    
-    const currentY = e.touches[0].clientY;
-    const diff = touchStartY - currentY; // Negative = swipe down, Positive = swipe up
-    const threshold = 15; // Pixels to move before registering
-    
-    if (Math.abs(diff) > threshold) {
-        e.preventDefault();
-    }
-}
-
-function handleSpinnerTouchEnd(e) {
-    if (!spinnerType) return;
-    
-    const currentY = e.changedTouches[0].clientY;
-    const diff = touchStartY - currentY;
-    const increment = Math.round(diff / 30); // Every 30px = 1 increment
-    
-    if (spinnerType === 'hours') {
-        customHours = Math.max(0, Math.min(23, touchStartValue + increment));
-    } else if (spinnerType === 'minutes') {
-        customMinutes = Math.max(0, Math.min(59, touchStartValue + Math.round(increment * 5)));
-    }
-    
-    updateCustomSpinnerDisplay();
-    spinnerType = null;
-}
 
 // Theme toggle
 function toggleTheme() {
@@ -853,13 +834,11 @@ function updateThemeIcon() {
 
 function loadThemePreference() {
     const saved = localStorage.getItem('beercd_darkMode');
-    if (saved === 'true') {
+    if (saved === 'false') {
+        document.body.classList.remove('dark-mode');
+    } else {
+        // Dark mode by default
         document.body.classList.add('dark-mode');
-    } else if (saved === null) {
-        // Check system preference
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.body.classList.add('dark-mode');
-        }
     }
     updateThemeIcon();
 }
@@ -871,6 +850,5 @@ window.addEventListener('DOMContentLoaded', () => {
     updateSoundToggle();
     updateCustomSpinnerDisplay();
     updatePresetButtonsUI();
-    initSpinnerTouch();
 });
 
