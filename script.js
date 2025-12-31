@@ -231,11 +231,12 @@ function saveCooldownState() {
     localStorage.setItem('beercd_notificationsEnabled', notificationsEnabled.toString());
 }
 
-// Play beer sound effect
+// Play sound effect (beer or shot depending on active tab)
 function playBeerSound() {
     if (!soundEnabled) return;
     
-    const audio = document.getElementById('beerSound');
+    const audioId = activeTab === 'beer' ? 'beerSound' : 'shotSound';
+    const audio = document.getElementById(audioId);
     if (audio) {
         // Set volume to 25% to make it less loud (some MP3s are mastered very loud)
         audio.volume = 0.25;
