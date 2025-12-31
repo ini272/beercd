@@ -361,15 +361,17 @@ async function requestNotificationPermission() {
 
 // Show notification when timer expires
 function showTimerNotification() {
-    if (!notificationsEnabled || !('Notification' in window)) {
+    if (!('Notification' in window)) {
+        // Fallback for browsers without Notification support
+        alert('🍺 BeerCD - Cooldown Complete!\nYour cooldown timer has finished.');
         return;
     }
     
     if (Notification.permission === 'granted') {
         const notification = new Notification('🍺 BeerCD - Cooldown Complete!', {
             body: 'Your cooldown timer has finished.',
-            icon: '/icons/icon-192x192.png',
-            badge: '/icons/icon-192x192.png',
+            icon: 'https://ini272.github.io/beercd/icons/icon-192x192.png',
+            badge: 'https://ini272.github.io/beercd/icons/icon-192x192.png',
             tag: 'beercd-cooldown-complete',
             requireInteraction: false
         });
@@ -384,6 +386,9 @@ function showTimerNotification() {
             window.focus();
             notification.close();
         };
+    } else {
+        // Fallback if permission not granted
+        alert('🍺 BeerCD - Cooldown Complete!\nYour cooldown timer has finished.');
     }
 }
 
