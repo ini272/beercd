@@ -266,27 +266,67 @@ function updateSoundToggle() {
     }
 }
 
-// Show bubbly beer animation
+// Show bubbly beer animation or glittery shot animation
 function showBeerAnimation() {
     const overlay = document.getElementById('beerAnimation');
     if (!overlay) return;
     
-    // Create bubbles
     const bubblesContainer = overlay.querySelector('.bubbles-container');
-    bubblesContainer.innerHTML = ''; // Clear existing bubbles
+    bubblesContainer.innerHTML = ''; // Clear existing particles
     
-    // Generate random bubbles
-    for (let i = 0; i < 30; i++) {
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble';
-        bubble.style.left = Math.random() * 100 + '%';
-        bubble.style.animationDelay = Math.random() * 2 + 's';
-        bubble.style.animationDuration = (Math.random() * 2 + 2) + 's';
-        bubble.style.width = bubble.style.height = (Math.random() * 15 + 5) + 'px';
-        bubblesContainer.appendChild(bubble);
+    if (activeTab === 'beer') {
+        // Beer: bubbles rising up
+        for (let i = 0; i < 30; i++) {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.style.left = Math.random() * 100 + '%';
+            bubble.style.animationDelay = Math.random() * 2 + 's';
+            bubble.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            bubble.style.width = bubble.style.height = (Math.random() * 15 + 5) + 'px';
+            bubblesContainer.appendChild(bubble);
+        }
+    } else {
+        // Shot: glittery rainbow stars bursting
+        const rainbowColors = [
+            '#ff0000', // Red
+            '#ff7700', // Orange
+            '#ffff00', // Yellow
+            '#00ff00', // Green
+            '#0099ff', // Blue
+            '#6633ff', // Purple
+            '#ff3388'  // Pink
+        ];
+        
+        for (let i = 0; i < 50; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 0.5 + 's';
+            star.style.animationDuration = (Math.random() * 1 + 1.5) + 's';
+            star.style.width = star.style.height = (Math.random() * 8 + 3) + 'px';
+            
+            // Random rainbow color
+            const color = rainbowColors[Math.floor(Math.random() * rainbowColors.length)];
+            star.style.setProperty('--star-color', color);
+            
+            // Random burst direction
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 200 + 100;
+            const tx = Math.cos(angle) * distance;
+            const ty = Math.sin(angle) * distance;
+            star.style.setProperty('--tx', tx + 'px');
+            star.style.setProperty('--ty', ty + 'px');
+            bubblesContainer.appendChild(star);
+        }
     }
     
-    // Show overlay
+    // Show overlay with appropriate background
+    if (activeTab === 'beer') {
+        overlay.style.background = 'linear-gradient(135deg, rgba(139, 69, 19, 0.9) 0%, rgba(101, 67, 33, 0.9) 100%)';
+    } else {
+        overlay.style.background = 'rgba(0, 0, 0, 0.8)';
+    }
     overlay.classList.add('active');
     
     // Hide after animation completes

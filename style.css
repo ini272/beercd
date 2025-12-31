@@ -1003,4 +1003,29 @@ h1 {
     }
 }
 
+.star {
+    position: absolute;
+    background: var(--star-color, #ffd700);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    animation: star-burst ease-out forwards;
+    box-shadow: 0 0 15px var(--star-color, #ffd700);
+    --tx: 0px;
+    --ty: 0px;
+    --star-color: #ffd700;
+}
+
+@keyframes star-burst {
+    0% {
+        opacity: 1;
+        transform: scale(1) translate(0, 0);
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.5) translate(var(--tx), var(--ty));
+    }
+}
+
 
