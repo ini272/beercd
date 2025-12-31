@@ -12,7 +12,7 @@ let shotEndTime = null;
 // Timer management
 let timerInterval = null;
 let soundEnabled = true;  // Sound enabled by default
-let notificationsEnabled = false;
+let notificationsEnabled = true;  // Notifications enabled by default
 
 // Custom duration spinner state
 let customHours = 1;

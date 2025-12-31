@@ -1,12 +1,12 @@
-const CACHE_NAME = 'beercd-v3';
+const CACHE_NAME = 'beercd-v4';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/script.js',
-  '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  'https://ini272.github.io/beercd/',
+  'https://ini272.github.io/beercd/index.html',
+  'https://ini272.github.io/beercd/style.css',
+  'https://ini272.github.io/beercd/script.js',
+  'https://ini272.github.io/beercd/manifest.json',
+  'https://ini272.github.io/beercd/icons/icon-192x192.png',
+  'https://ini272.github.io/beercd/icons/icon-512x512.png'
 ];
 
 // Install event - cache app files
@@ -76,8 +76,8 @@ function checkAndShowNotification() {
   if (now >= scheduledEndTime) {
     self.registration.showNotification('🍺 BeerCD - Cooldown Complete!', {
       body: 'Your cooldown timer has finished.',
-      icon: '/icons/icon-192x192.png',
-      badge: '/icons/icon-192x192.png',
+      icon: 'https://ini272.github.io/beercd/icons/icon-192x192.png',
+      badge: 'https://ini272.github.io/beercd/icons/icon-192x192.png',
       tag: 'beercd-cooldown-complete',
       requireInteraction: false,
       vibrate: [200, 100, 200]
@@ -102,13 +102,13 @@ self.addEventListener('notificationclick', (event) => {
         // If app is already open, focus it
         for (let i = 0; i < clientList.length; i++) {
           const client = clientList[i];
-          if (client.url === '/' && 'focus' in client) {
+          if (client.url.includes('beercd') && 'focus' in client) {
             return client.focus();
           }
         }
         // Otherwise open a new window
         if (clients.openWindow) {
-          return clients.openWindow('/');
+          return clients.openWindow('https://ini272.github.io/beercd/');
         }
       })
   );
