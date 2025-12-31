@@ -838,8 +838,35 @@ function handleSpinnerTouchEnd(e) {
     spinnerType = null;
 }
 
+// Theme toggle
+function toggleTheme() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('beercd_darkMode', isDark);
+    updateThemeIcon();
+}
+
+function updateThemeIcon() {
+    const icon = document.getElementById('themeIcon');
+    const isDark = document.body.classList.contains('dark-mode');
+    icon.textContent = isDark ? '☀️' : '🌙';
+}
+
+function loadThemePreference() {
+    const saved = localStorage.getItem('beercd_darkMode');
+    if (saved === 'true') {
+        document.body.classList.add('dark-mode');
+    } else if (saved === null) {
+        // Check system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark-mode');
+        }
+    }
+    updateThemeIcon();
+}
+
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', () => {
+    loadThemePreference();
     loadCooldownState();
     updateSoundToggle();
     updateCustomSpinnerDisplay();
